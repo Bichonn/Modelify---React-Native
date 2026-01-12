@@ -1,5 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, FlatList } from 'react-native';
+import { useState } from 'react';
+import { StyleSheet, Text, View, FlatList, Pressable, Image } from 'react-native';
+import * as Haptics from 'expo-haptics';
 
 const Projects = [
   {
@@ -8,6 +10,7 @@ const Projects = [
     description: 'un petit pot de fleurs bleu rond',
     use: 'décoration',
     budget: 15,
+    image: require('./assets/Project-Images/pot-fleur-bleu-rond.png'),
   },
   {
     id: 2,
@@ -15,6 +18,7 @@ const Projects = [
     description: 'un support téléphone en bois',
     use: 'commercial',
     budget: 45,
+    image: require('./assets/Project-Images/support-smartphone-wood.png'),
   },
   {
     id: 3,
@@ -22,10 +26,13 @@ const Projects = [
     description: 'une maquette de maison pour projet 3D',
     use: 'pédagogique',
     budget: 30,
+    image: require('./assets/Project-Images/maquette-home.png'),
   },
 ];
 
 export default function App() {
+  const [showImage, setShowImage] = useState(null);
+
   return (
     <View style={styles.container}>
       <Text>Welcome to</Text>
@@ -34,12 +41,20 @@ export default function App() {
         data={Projects} 
         keyExtractor={(item) => item.id.toString()} 
         renderItem={({ item }) => (
-          <View style={styles.ElementlistProject}>
-            <Text style={styles.ProjectTitle}>{item.title}</Text>
-            <Text>{item.description}</Text>
-            <Text>{item.use}</Text>
-            <Text>{item.budget} €</Text>
-          </View>
+          <Pressable onPress={() => { 
+            setShowImage(showImage === item.image ? null : item.image),
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            console.log('Project selected:', item.title);
+          }}>
+            <View style={styles.ElementlistProject}>
+              <Text style={styles.ProjectTitle}>{item.title}</Text>
+              <Text>{item.description}</Text>
+              <Text style={styles.ProjectUse}>{item.use}</Text>
+              <Text>{item.budget} €</Text>
+
+              {showImage === item.image && ( <Image source={item.image} style={styles.ProjectImage} />)}
+            </View>
+          </Pressable>
         )} />
       <StatusBar style="auto" />
     </View>
@@ -71,6 +86,15 @@ const styles = StyleSheet.create({
   },
   ProjectTitle: {
     fontWeight: 'bold',
+  },
+  ProjectUse: {
+    fontStyle: 'italic',
+    color: 'gray',
+  },
+  ProjectImage: {
+    width: 100,
+    height: 100,
+    marginTop: 10,
   },
 
 
